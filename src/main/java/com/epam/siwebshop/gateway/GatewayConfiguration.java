@@ -12,6 +12,7 @@ import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.http.outbound.HttpRequestExecutingMessageHandler;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -21,16 +22,17 @@ import java.util.List;
 public class GatewayConfiguration {
 
     @Bean
-    @ServiceActivator(inputChannel = "outboundItemChannel")
+    @ServiceActivator(inputChannel = "convertedItemChannel")
     public HttpRequestExecutingMessageHandler itemGateway() {
-        HttpRequestExecutingMessageHandler httpMessageHandler =
-                new HttpRequestExecutingMessageHandler("https://siwebshop.free.beeceptor.com/item");
+        RestTemplate restTemplate = new RestTemplateBuilder()
+            .defaultHeader(MessageHeaders.CONTENT_TYPE, "text/html")
+            .build();
 
-        List<HttpMessageConverter> httpMessageConverters = new ArrayList<>();
-        httpMessageConverters.add(new MappingJackson2HttpMessageConverter());
+        HttpRequestExecutingMessageHandler httpMessageHandler =
+                new HttpRequestExecutingMessageHandler("http://localhost:8080/", restTemplate);
 
         httpMessageHandler.setHttpMethod(HttpMethod.POST);
-        httpMessageHandler.setExpectedResponseType(String.class);
+        //httpMessageHandler.setExpectedResponseType(String.class);
         httpMessageHandler.setOutputChannelName("itemResponseChannel");
 
         return httpMessageHandler;

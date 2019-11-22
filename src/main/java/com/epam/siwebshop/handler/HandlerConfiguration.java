@@ -2,6 +2,9 @@ package com.epam.siwebshop.handler;
 
 import com.epam.siwebshop.model.Item;
 import com.epam.siwebshop.model.Order;
+import com.epam.siwebshop.transformer.ItemToJsonTransformer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.juli.logging.Log;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +13,8 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.annotation.Splitter;
 import org.springframework.integration.annotation.Transformer;
 import org.springframework.integration.handler.LoggingHandler;
+import org.springframework.integration.json.JsonToObjectTransformer;
+import org.springframework.integration.json.ObjectToJsonTransformer;
 import org.springframework.integration.router.ExpressionEvaluatingRouter;
 import org.springframework.integration.transformer.HeaderEnricher;
 import org.springframework.integration.transformer.support.HeaderValueMessageProcessor;
@@ -45,11 +50,24 @@ public class HandlerConfiguration {
         return order.getItems();
     }
 
+    @Transformer(inputChannel = "outboundItemChannel", outputChannel = "convertedItemChannel")
+    public String jsonTransformer(Item item) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(item);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     @Bean
-    @ServiceActivator(inputChannel = "outboundItemChannel")
+    @ServiceActivator(inputChannel = "convertedItemChannel")
     public LoggingHandler itemLogger() {
         LoggingHandler loggingHandler = new LoggingHandler(LoggingHandler.Level.INFO);
-        loggingHandler.setLogExpressionString("headers['discount'] == null ? 'No discount ' + payload : headers['discount']*100 + '% ' + payload");
+        loggingHandler.setLogExpressionString("headers + ' ' + payload");
+        //loggingHandler.setLogExpressionString("headers['discount'] == null ? 'No discount ' + payload : headers['discount']*100 + '% ' + payload");
 
         return loggingHandler;
     }

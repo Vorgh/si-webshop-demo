@@ -29,6 +29,11 @@ public class ChannelConfiguration {
     }
 
     @Bean
+    public PublishSubscribeChannel convertedItemChannel() {
+        return new PublishSubscribeChannel();
+    }
+
+    @Bean
     public DirectChannel itemResponseChannel() {
         return new DirectChannel();
     }

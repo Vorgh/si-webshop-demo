@@ -1,9 +1,16 @@
 package com.epam.siwebshop.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Item {
 
+    @JsonProperty
     private Long id;
+
+    @JsonProperty
     private String name;
+
+    @JsonProperty
     private Double price;
 
     public Item() {
