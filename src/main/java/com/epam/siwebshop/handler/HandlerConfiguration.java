@@ -60,11 +60,6 @@ public class HandlerConfiguration {
         return new ObjectToJsonTransformer();
     }
 
-    @Transformer(inputChannel = "inputChannel", outputChannel = "outputChannel")
-    public String itemTransformer(Item item) {
-        return item.getId() + " " + item.getPrice();
-    }
-
     @Bean
     @ServiceActivator(inputChannel = "convertedItemChannel")
     public LoggingHandler convertedItemLogger() {
