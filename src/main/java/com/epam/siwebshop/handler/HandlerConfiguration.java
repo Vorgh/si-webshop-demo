@@ -5,11 +5,14 @@ import com.epam.siwebshop.model.Order;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.Router;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.annotation.Splitter;
 import org.springframework.integration.annotation.Transformer;
+import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.integration.json.ObjectToJsonTransformer;
 import org.springframework.integration.router.ExpressionEvaluatingRouter;
 import org.springframework.integration.transformer.HeaderEnricher;
+import org.springframework.integration.transformer.support.ExpressionEvaluatingHeaderValueMessageProcessor;
 import org.springframework.integration.transformer.support.HeaderValueMessageProcessor;
 import org.springframework.integration.transformer.support.StaticHeaderValueMessageProcessor;
 
@@ -38,7 +41,15 @@ public class HandlerConfiguration {
         return new HeaderEnricher(headersToAdd);
     }
 
-    @Splitter(inputChannel = "processedOrderChannel", outputChannel = "outboundItemChannel")
+    @Bean
+    @Transformer(inputChannel = "processedOrderChannel", outputChannel = "enrichedOrderChannel")
+    public HeaderEnricher orderIdHeaderEnricher() {
+
+        return new HeaderEnricher(Collections.singletonMap("orderId",
+                new ExpressionEvaluatingHeaderValueMessageProcessor<>("payload.id", Long.class)));
+    }
+
+    @Splitter(inputChannel = "enrichedOrderChannel", outputChannel = "outboundItemChannel")
     public List<Item> orderSplitter(Order order) {
         return order.getItems();
     }
@@ -47,5 +58,19 @@ public class HandlerConfiguration {
     @Transformer(inputChannel = "outboundItemChannel", outputChannel = "convertedItemChannel")
     public ObjectToJsonTransformer jsonTransformer() {
         return new ObjectToJsonTransformer();
+    }
+
+    @Transformer(inputChannel = "inputChannel", outputChannel = "outputChannel")
+    public String itemTransformer(Item item) {
+        return item.getId() + " " + item.getPrice();
+    }
+
+    @Bean
+    @ServiceActivator(inputChannel = "convertedItemChannel")
+    public LoggingHandler convertedItemLogger() {
+        LoggingHandler loggingHandler = new LoggingHandler(LoggingHandler.Level.INFO);
+        loggingHandler.setLogExpressionString("headers");
+
+        return loggingHandler;
     }
 }

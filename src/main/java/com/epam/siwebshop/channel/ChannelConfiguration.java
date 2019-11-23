@@ -24,6 +24,11 @@ public class ChannelConfiguration {
     }
 
     @Bean
+    public PublishSubscribeChannel enrichedOrderChannel() {
+        return new PublishSubscribeChannel();
+    }
+
+    @Bean
     public PublishSubscribeChannel outboundItemChannel() {
         return new PublishSubscribeChannel();
     }
