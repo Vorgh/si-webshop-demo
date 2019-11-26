@@ -45,8 +45,12 @@ public class HandlerConfiguration {
     @Transformer(inputChannel = "processedOrderChannel", outputChannel = "enrichedOrderChannel")
     public HeaderEnricher orderIdHeaderEnricher() {
 
-        return new HeaderEnricher(Collections.singletonMap("orderId",
-                new ExpressionEvaluatingHeaderValueMessageProcessor<>("payload.id", Long.class)));
+        Map<String, ? extends HeaderValueMessageProcessor<?>> headerMap = Map.of(
+            "orderId", new ExpressionEvaluatingHeaderValueMessageProcessor<>("payload.id", Long.class),
+            "orderSize", new ExpressionEvaluatingHeaderValueMessageProcessor<>("payload.items.size()", Integer.class)
+        );
+
+        return new HeaderEnricher(headerMap);
     }
 
     @Splitter(inputChannel = "enrichedOrderChannel", outputChannel = "outboundItemChannel")
