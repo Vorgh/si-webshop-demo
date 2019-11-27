@@ -68,7 +68,7 @@ public class HandlerConfiguration {
     @ServiceActivator(inputChannel = "convertedItemChannel")
     public LoggingHandler convertedItemLogger() {
         LoggingHandler loggingHandler = new LoggingHandler(LoggingHandler.Level.INFO);
-        loggingHandler.setLogExpressionString("headers");
+        loggingHandler.setLogExpressionString("headers + ' ' + payload");
 
         return loggingHandler;
     }
