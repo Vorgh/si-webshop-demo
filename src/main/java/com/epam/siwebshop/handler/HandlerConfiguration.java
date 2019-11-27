@@ -1,7 +1,7 @@
 package com.epam.siwebshop.handler;
 
-import com.epam.siwebshop.model.Item;
-import com.epam.siwebshop.model.Order;
+import com.epam.common.model.Item;
+import com.epam.common.model.Order;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.Router;

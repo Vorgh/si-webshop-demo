@@ -1,7 +1,7 @@
 package com.epam.siwebshop;
 
-import com.epam.siwebshop.model.Item;
-import com.epam.siwebshop.model.Order;
+import com.epam.common.model.Item;
+import com.epam.common.model.Order;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

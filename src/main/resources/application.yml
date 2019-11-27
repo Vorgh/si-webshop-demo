@@ -1,2 +1,6 @@
 server:
   port: 8888
+
+#logging:
+#  level:
+#    org.springframework.web.client.RestTemplate: DEBUG

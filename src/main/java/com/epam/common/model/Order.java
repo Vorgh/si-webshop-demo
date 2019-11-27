@@ -1,4 +1,4 @@
-package com.epam.siwebshop.model;
+package com.epam.common.model;
 
 import java.util.List;
 
